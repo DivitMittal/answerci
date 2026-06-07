@@ -11,3 +11,9 @@ result-*
 
 ## git pre-commit hooks (handled via cachix/git-hooks)
 .pre-commit-config.yaml
+
+## Rust build output
+target/
+
+## AnswerCI local stores
+.answerci/
