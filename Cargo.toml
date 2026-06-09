@@ -1,0 +1,29 @@
+[workspace]
+members = [
+  "crates/answerci-core",
+  "crates/answerci-providers",
+  "crates/answerci-capture",
+  "crates/answerci-extract",
+  "crates/answerci-score",
+  "crates/answerci-report",
+  "crates/answerci-github",
+  "crates/answerci-cli",
+]
+resolver = "2"
+
+[workspace.package]
+edition = "2021"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/DivitMittal/answerci"
+
+[workspace.dependencies]
+anyhow = "1"
+chrono = { version = "0.4", features = ["serde", "clock"] }
+clap = { version = "4", features = ["derive"] }
+regex = "1"
+rusqlite = { version = "0.31", features = ["bundled"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+serde_yaml = "0.9"
+thiserror = "1"
+url = "2"
