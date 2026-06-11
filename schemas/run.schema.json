@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://answerci.dev/schemas/run.schema.json",
+  "title": "AnswerCI Run",
+  "type": "object",
+  "required": [
+    "id",
+    "suite_name",
+    "provider",
+    "started_at"
+  ],
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "suite_name": {
+      "type": "string"
+    },
+    "provider": {
+      "type": "string"
+    },
+    "started_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "completed_at": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    }
+  },
+  "additionalProperties": false
+}
