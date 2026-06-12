@@ -1,0 +1,108 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://answerci.dev/schemas/observation.schema.json",
+  "title": "AnswerCI Observation",
+  "type": "object",
+  "required": [
+    "id",
+    "run_id",
+    "prompt_id",
+    "provider",
+    "captured_at",
+    "raw_response_id",
+    "response_text"
+  ],
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "run_id": {
+      "type": "string"
+    },
+    "prompt_id": {
+      "type": "string"
+    },
+    "provider": {
+      "type": "string"
+    },
+    "captured_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "raw_response_id": {
+      "type": "string"
+    },
+    "response_text": {
+      "type": "string"
+    },
+    "mentions": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/mention"
+      },
+      "default": []
+    },
+    "citations": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/citation"
+      },
+      "default": []
+    },
+    "unsupported_claims": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "default": []
+    }
+  },
+  "$defs": {
+    "mention": {
+      "type": "object",
+      "required": [
+        "entity",
+        "first_position",
+        "matched_alias"
+      ],
+      "properties": {
+        "entity": {
+          "type": "string"
+        },
+        "first_position": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "matched_alias": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "citation": {
+      "type": "object",
+      "required": [
+        "url",
+        "position"
+      ],
+      "properties": {
+        "url": {
+          "type": "string",
+          "format": "uri"
+        },
+        "matched_entity": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "position": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}
