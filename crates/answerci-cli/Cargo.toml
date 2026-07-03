@@ -1,0 +1,24 @@
+[package]
+name = "answerci-cli"
+version = "0.1.0"
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[[bin]]
+name = "answerci"
+path = "src/main.rs"
+
+[dependencies]
+answerci-capture = { path = "../answerci-capture" }
+answerci-core = { path = "../answerci-core" }
+answerci-extract = { path = "../answerci-extract" }
+answerci-github = { path = "../answerci-github" }
+answerci-providers = { path = "../answerci-providers" }
+answerci-report = { path = "../answerci-report" }
+answerci-score = { path = "../answerci-score" }
+anyhow.workspace = true
+chrono.workspace = true
+clap.workspace = true
+serde_json.workspace = true
+serde_yaml.workspace = true
