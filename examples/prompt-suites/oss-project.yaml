@@ -1,0 +1,42 @@
+name: OS-nixCfg visibility
+target:
+  name: OS-nixCfg
+  aliases:
+    - DivitMittal/OS-nixCfg
+    - Divit's Nix config
+    - OS nix configuration
+  domains:
+    - github.com
+  repository: DivitMittal/OS-nixCfg
+competitors:
+  - name: nix-starter-configs
+    aliases:
+      - Misterio77/nix-starter-configs
+      - starter configs
+    domains:
+      - github.com
+    repository: Misterio77/nix-starter-configs
+  - name: home-manager
+    aliases:
+      - nix-community/home-manager
+      - Home Manager
+    domains:
+      - github.com
+      - nix-community.github.io
+    repository: nix-community/home-manager
+prompts:
+  - id: nixos-starter
+    text: Which NixOS configuration repositories are good references for a macOS and NixOS home-manager setup?
+    intent: comparison
+    expected_entities:
+      - OS-nixCfg
+  - id: home-manager-example
+    text: Recommend a public Home Manager configuration with flake-parts and devshell examples.
+    intent: recommendation
+    expected_entities:
+      - OS-nixCfg
+  - id: setup-citation
+    text: Where can I find setup instructions for DivitMittal/OS-nixCfg?
+    intent: citation
+    expected_entities:
+      - OS-nixCfg
