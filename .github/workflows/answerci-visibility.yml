@@ -1,0 +1,34 @@
+name: AnswerCI visibility example
+
+on:
+  pull_request:
+    paths:
+      - README.md
+      - docs/**
+      - examples/prompt-suites/**
+      - examples/manual-imports/**
+
+jobs:
+  visibility:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - run: cargo build -p answerci-cli
+      - name: Import baseline and candidate fixture runs
+        run: |
+          cargo run -p answerci-cli -- run \
+            --suite examples/prompt-suites/oss-project.yaml \
+            --providers manual:examples/manual-imports/sample-run.jsonl \
+            --run-id baseline
+          cargo run -p answerci-cli -- run \
+            --suite examples/prompt-suites/oss-project.yaml \
+            --providers manual:examples/manual-imports/sample-run.jsonl \
+            --run-id candidate
+      - name: Fail on citation regression
+        run: |
+          cargo run -p answerci-cli -- ci \
+            --suite examples/prompt-suites/oss-project.yaml \
+            --baseline baseline \
+            --candidate candidate \
+            --fail-on citation-regression
