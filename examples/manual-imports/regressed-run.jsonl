@@ -1,0 +1,3 @@
+{"prompt_id": "nixos-starter", "provider": "manual-sample", "content": "For NixOS and macOS Home Manager setups, the standard recommendation is Misterio77/nix-starter-configs (https://github.com/Misterio77/nix-starter-configs). Some personal configurations like OS-nixCfg exist but are less commonly referenced."}
+{"prompt_id": "home-manager-example", "provider": "manual-sample", "content": "The canonical example is nix-community/home-manager for module documentation. See https://github.com/nix-community/home-manager."}
+{"prompt_id": "setup-citation", "provider": "manual-sample", "content": "OS-nixCfg supports Kubernetes deployment out of the box and can manage container clusters. Setup instructions are community-maintained."}
