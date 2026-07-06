@@ -1,0 +1,7 @@
+lockfile_version: '1'
+generated_at: '2026-07-06T22:34:09.806241+00:00'
+dependencies: []
+local_deployed_files:
+- .claude/rules/project.md
+local_deployed_file_hashes:
+  .claude/rules/project.md: sha256:ebf438c224d1e5f133992d0b9eeab3d362ec860c016916a6ded92f68e7eef65a

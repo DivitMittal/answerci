@@ -15,5 +15,8 @@ result-*
 ## Rust build output
 target/
 
+## Microsoft APM (Agent Package Manager)
+apm_modules/
+
 ## AnswerCI local stores
 .answerci/
