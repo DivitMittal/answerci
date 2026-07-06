@@ -1,0 +1,29 @@
+cff-version: 1.2.0
+message: "If you use AnswerCI, please cite the software and the accompanying paper."
+title: "AnswerCI: Visibility Regression Testing for AI Answer Engines"
+type: software
+authors:
+  - family-names: Mittal
+    given-names: Divit
+    email: divit.229309249@muj.manipal.edu
+    affiliation: "Department of Data Science and Engineering, Manipal University Jaipur"
+version: 0.1.0
+date-released: 2026-07-06
+license: "MIT OR Apache-2.0"
+repository-code: "https://github.com/DivitMittal/answerci"
+abstract: "AnswerCI is a CLI-first, CI-native toolkit for testing whether documentation changes improve or damage how AI answer engines mention, cite, rank, or misrepresent a project."
+keywords:
+  - answer engines
+  - citation analysis
+  - continuous integration
+  - generative engine optimization
+  - regression testing
+preferred-citation:
+  type: conference-paper
+  title: "Visibility Regression Testing and Citation Failure Diagnosis for Open-Source Projects in Generative Answer Engines"
+  authors:
+    - family-names: Mittal
+      given-names: Divit
+      email: divit.229309249@muj.manipal.edu
+      affiliation: "Department of Data Science and Engineering, Manipal University Jaipur"
+  year: 2026
