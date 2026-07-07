@@ -44,7 +44,7 @@ pub fn scan_local_repo(repo: &str, root: impl AsRef<Path>) -> Result<PromptSuite
     let slug = RepoSlug::parse(repo)?;
     let root = root.as_ref();
     let docs = read_docs(root)?;
-    let description = first_non_empty_line(&docs).unwrap_or_else(|| slug.repo.clone());
+    let description = first_markdown_heading(&docs).unwrap_or_else(|| slug.repo.clone());
     let repo_full_name = slug.full_name();
 
     Ok(PromptSuite {
@@ -105,17 +105,50 @@ fn candidate_doc_paths(root: &Path) -> Vec<PathBuf> {
     paths
 }
 
-fn first_non_empty_line(content: &str) -> Option<String> {
+fn first_markdown_heading(content: &str) -> Option<String> {
     content
         .lines()
-        .map(|line| line.trim().trim_start_matches('#').trim())
-        .find(|line| !line.is_empty())
-        .map(ToOwned::to_owned)
+        .filter_map(markdown_heading_text)
+        .find(|heading| !heading.is_empty() && !heading.contains(['<', '>']))
+}
+
+fn markdown_heading_text(line: &str) -> Option<String> {
+    let trimmed = line.trim_start();
+    let marker_len = trimmed
+        .chars()
+        .take_while(|character| *character == '#')
+        .count();
+    if marker_len == 0 || marker_len > 6 {
+        return None;
+    }
+
+    let heading = trimmed[marker_len..].trim();
+    if heading.is_empty() {
+        return None;
+    }
+    Some(strip_inline_html_tags(heading).trim().to_string())
+}
+
+fn strip_inline_html_tags(text: &str) -> String {
+    let mut stripped = String::new();
+    let mut inside_tag = false;
+
+    for character in text.chars() {
+        match character {
+            '<' => inside_tag = true,
+            '>' if inside_tag => inside_tag = false,
+            _ if !inside_tag => stripped.push(character),
+            _ => {}
+        }
+    }
+
+    stripped
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::time::{SystemTime, UNIX_EPOCH};
 
     #[test]
     fn parses_owner_repo_and_urls() {
@@ -125,5 +158,45 @@ mod tests {
                 .full_name(),
             "DivitMittal/OS-nixCfg"
         );
+    }
+
+    #[test]
+    fn ignores_html_blocks_when_deriving_aliases() {
+        let root = fixture_dir("html-heavy-readme");
+        fs::create_dir_all(&root).expect("create fixture directory");
+        fs::write(
+            root.join("README.md"),
+            r#"<div id="top">
+  <h1>HTML-only title</h1>
+</div>
+
+# <span>OS-nixCfg</span>
+
+Project documentation.
+"#,
+        )
+        .expect("write readme");
+
+        let suite = scan_local_repo("DivitMittal/OS-nixCfg", &root).expect("scan repo");
+        fs::remove_dir_all(&root).expect("remove fixture directory");
+
+        assert!(suite
+            .target
+            .aliases
+            .iter()
+            .all(|alias| !alias.contains('<')));
+        assert!(suite
+            .target
+            .aliases
+            .iter()
+            .all(|alias| !alias.contains('>')));
+    }
+
+    fn fixture_dir(name: &str) -> PathBuf {
+        let suffix = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .expect("system clock before unix epoch")
+            .as_nanos();
+        std::env::temp_dir().join(format!("answerci-{name}-{suffix}"))
     }
 }
