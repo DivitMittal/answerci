@@ -15,7 +15,7 @@ use clap::{Parser, Subcommand, ValueEnum};
 
 #[derive(Debug, Parser)]
 #[command(name = "answerci")]
-#[command(about = "Visibility regression testing for AI answer engines")]
+#[command(about = "Offline visibility regression testing for AI answer engines")]
 struct Cli {
     #[command(subcommand)]
     command: Commands,
@@ -23,89 +23,120 @@ struct Cli {
 
 #[derive(Debug, Subcommand)]
 enum Commands {
+    #[command(about = "Create AnswerCI project directories for suites, imports, and reports")]
     Init {
-        #[arg(default_value = ".")]
+        #[arg(default_value = ".", help = "Directory to initialize")]
         path: PathBuf,
     },
+    #[command(about = "Create and manage prompt suites")]
     Suite {
         #[command(subcommand)]
         command: SuiteCommands,
     },
+    #[command(about = "Generate a starter suite from a local GitHub-style checkout")]
     ScanGithub {
+        #[arg(help = "Repository slug or GitHub URL, such as owner/repo")]
         repo: String,
-        #[arg(long, default_value = ".")]
+        #[arg(long, default_value = ".", help = "Local checkout root to scan")]
         root: PathBuf,
-        #[arg(long)]
+        #[arg(long, help = "Write the generated suite YAML to this path")]
         output: Option<PathBuf>,
     },
+    #[command(about = "Capture a suite with offline provider inputs and store observations")]
     Run {
-        #[arg(long)]
+        #[arg(long, help = "Prompt suite YAML file to run")]
         suite: PathBuf,
-        #[arg(long)]
+        #[arg(
+            long,
+            help = "Comma-separated provider specs, such as manual:path/to/import.jsonl"
+        )]
         providers: String,
-        #[arg(long, default_value = ".answerci/runs.db")]
+        #[arg(
+            long,
+            default_value = ".answerci/runs.db",
+            help = "SQLite capture store path"
+        )]
         store: PathBuf,
-        #[arg(long)]
+        #[arg(long, help = "Run identifier to use instead of a timestamped ID")]
         run_id: Option<String>,
-        #[arg(long)]
+        #[arg(long, help = "Export extracted observations for the run as JSONL")]
         export_jsonl: Option<PathBuf>,
     },
+    #[command(about = "Compare baseline and candidate run scores as JSON")]
     Diff {
-        #[arg(long)]
+        #[arg(long, help = "Prompt suite YAML file used by both runs")]
         suite: PathBuf,
-        #[arg(long)]
+        #[arg(long, help = "Baseline run identifier")]
         baseline: String,
-        #[arg(long)]
+        #[arg(long, help = "Candidate run identifier")]
         candidate: String,
-        #[arg(long, default_value = ".answerci/runs.db")]
+        #[arg(
+            long,
+            default_value = ".answerci/runs.db",
+            help = "SQLite capture store path"
+        )]
         store: PathBuf,
     },
+    #[command(about = "Render a Markdown report for one run or a baseline comparison")]
     Report {
-        #[arg(long, value_enum, default_value_t = ReportFormat::Markdown)]
+        #[arg(long, value_enum, default_value_t = ReportFormat::Markdown, help = "Report output format")]
         format: ReportFormat,
-        #[arg(long)]
+        #[arg(long, help = "Prompt suite YAML file for scoring context")]
         suite: PathBuf,
-        #[arg(long)]
+        #[arg(long, help = "Single run identifier to report")]
         run: Option<String>,
-        #[arg(long)]
+        #[arg(long, help = "Baseline run identifier for comparison reports")]
         baseline: Option<String>,
-        #[arg(long)]
+        #[arg(long, help = "Candidate run identifier for comparison reports")]
         candidate: Option<String>,
-        #[arg(long, default_value = ".answerci/runs.db")]
+        #[arg(
+            long,
+            default_value = ".answerci/runs.db",
+            help = "SQLite capture store path"
+        )]
         store: PathBuf,
-        #[arg(long)]
+        #[arg(long, help = "Write the report to this path instead of stdout")]
         output: Option<PathBuf>,
     },
+    #[command(about = "Gate CI on regressions between baseline and candidate runs")]
     Ci {
-        #[arg(long)]
+        #[arg(long, help = "Regression policy that should fail the command")]
         fail_on: FailOn,
-        #[arg(long)]
+        #[arg(long, help = "Prompt suite YAML file used by both runs")]
         suite: PathBuf,
-        #[arg(long)]
+        #[arg(long, help = "Baseline run identifier")]
         baseline: String,
-        #[arg(long)]
+        #[arg(long, help = "Candidate run identifier")]
         candidate: String,
-        #[arg(long, default_value = ".answerci/runs.db")]
+        #[arg(
+            long,
+            default_value = ".answerci/runs.db",
+            help = "SQLite capture store path"
+        )]
         store: PathBuf,
     },
 }
 
 #[derive(Debug, Subcommand)]
 enum SuiteCommands {
+    #[command(about = "Print or write a starter prompt suite")]
     New {
+        #[arg(help = "Target project name for the starter suite")]
         name: String,
-        #[arg(long)]
+        #[arg(long, help = "Write the generated suite YAML to this path")]
         output: Option<PathBuf>,
     },
 }
 
 #[derive(Debug, Clone, ValueEnum)]
 enum ReportFormat {
+    /// Markdown report output.
     Markdown,
 }
 
 #[derive(Debug, Clone, ValueEnum)]
 enum FailOn {
+    /// Fail when the candidate citation rate is lower than the baseline.
     CitationRegression,
 }
 
