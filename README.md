@@ -79,7 +79,7 @@ cargo run -p answerci-cli -- run \
 | `answerci init [path]` | Creates `prompt-suites/`, `manual-imports/`, and `reports/` directories under `path` or the current directory. |
 | `answerci suite new <name> [--output <path>]` | Prints or writes a starter prompt suite for the named target project. |
 | `answerci scan-github <owner/repo> [--root <path>] [--output <path>]` | Generates a starter suite from local `README.md` and `docs/` Markdown in a GitHub-style checkout without calling GitHub. |
-| `answerci run --suite <path> --providers <specs> [--store <path>] [--run-id <id>] [--export-jsonl <path>]` | Imports offline provider responses, extracts observations, stores them in SQLite, and prints `RUN_ID=<id>`. |
+| `answerci run --suite <path> --providers <specs> [--store <path>] [--run-id <id>] [--export-jsonl <path>]` | Captures provider specs (`manual:<jsonl-path>`, `mock`, or `openai`), extracts observations, stores them in SQLite, and prints `RUN_ID=<id>`. |
 | `answerci diff --suite <path> --baseline <id> --candidate <id> [--store <path>]` | Scores two stored runs and prints the signed regression delta as JSON. |
 | `answerci report --suite <path> (--run <id> \| --candidate <id>) [--baseline <id>] [--format markdown] [--store <path>] [--output <path>]` | Renders a Markdown report for one run or a baseline-vs-candidate comparison. |
 | `answerci ci --suite <path> --baseline <id> --candidate <id> --fail-on citation-regression [--store <path>]` | Exits non-zero when the candidate citation rate is lower than the baseline citation rate. |

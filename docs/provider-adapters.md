@@ -25,7 +25,7 @@ Each line contains `prompt_id`, `provider`, and `content` fields. Optional `id` 
 
 ## Mock provider
 
-`MockProvider` is for unit tests. It maps prompt IDs to response strings and never performs network calls.
+Use `--providers mock` for deterministic offline captures generated from the prompt suite. `MockProvider` maps prompt IDs to response strings and never performs network calls.
 
 ## OpenAI stub
 

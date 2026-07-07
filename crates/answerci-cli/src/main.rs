@@ -1,3 +1,4 @@
+use std::collections::HashMap;
 use std::fs;
 use std::path::{Path, PathBuf};
 use std::process::ExitCode;
@@ -6,7 +7,7 @@ use answerci_capture::CaptureStore;
 use answerci_core::{PromptSuite, Run, Scores};
 use answerci_extract::extract_observation;
 use answerci_github::scan_local_repo;
-use answerci_providers::{ManualImportProvider, OpenAiProvider, Provider};
+use answerci_providers::{ManualImportProvider, MockProvider, OpenAiProvider, Provider};
 use answerci_report::generate_markdown_report;
 use answerci_score::{compute_scores, regression_delta};
 use anyhow::{anyhow, Context, Result};
@@ -48,7 +49,7 @@ enum Commands {
         suite: PathBuf,
         #[arg(
             long,
-            help = "Comma-separated provider specs, such as manual:path/to/import.jsonl"
+            help = "Comma-separated provider specs: manual:<jsonl-path>, mock, or openai"
         )]
         providers: String,
         #[arg(
@@ -239,7 +240,7 @@ fn run_suite(
         .map(str::trim)
         .filter(|value| !value.is_empty())
     {
-        let mut provider = build_provider(provider_spec)?;
+        let mut provider = build_provider(provider_spec, &suite)?;
         let run = Run {
             id: run_id.clone(),
             suite_name: suite.name.clone(),
@@ -266,16 +267,39 @@ fn run_suite(
     Ok(())
 }
 
-fn build_provider(spec: &str) -> Result<Box<dyn Provider>> {
+fn build_provider(spec: &str, suite: &PromptSuite) -> Result<Box<dyn Provider>> {
     if let Some(path) = spec.strip_prefix("manual:") {
         return Ok(Box::new(ManualImportProvider::from_jsonl(path)?));
     }
     match spec {
+        "mock" => Ok(Box::new(MockProvider::new(mock_responses(suite)))),
         "openai" => Ok(Box::new(OpenAiProvider::new())),
         other => Err(anyhow!(
-            "unknown provider '{other}'. Use manual:<jsonl-path> or openai"
+            "unknown provider '{other}'. Use manual:<jsonl-path>, mock, or openai"
         )),
     }
+}
+
+fn mock_responses(suite: &PromptSuite) -> HashMap<String, String> {
+    suite
+        .prompts
+        .iter()
+        .map(|prompt| {
+            (
+                prompt.id.clone(),
+                format!(
+                    "Mock answer for {} about {}. See https://github.com/{}.",
+                    prompt.id,
+                    suite.target.name,
+                    suite
+                        .target
+                        .repository
+                        .as_deref()
+                        .unwrap_or(&suite.target.name)
+                ),
+            )
+        })
+        .collect()
 }
 
 fn diff_runs(suite_path: &Path, store_path: &Path, baseline: &str, candidate: &str) -> Result<()> {
@@ -381,4 +405,31 @@ fn write_yaml_or_stdout(suite: &PromptSuite, output: Option<&Path>) -> Result<()
         println!("{yaml}");
     }
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn builds_mock_provider_from_provider_spec() {
+        let suite = PromptSuite {
+            name: "test".to_string(),
+            target: answerci_core::Entity {
+                name: "AnswerCI".to_string(),
+                aliases: vec![],
+                domains: vec![],
+                repository: Some("DivitMittal/answerci".to_string()),
+            },
+            competitors: vec![],
+            prompts: vec![answerci_core::Prompt {
+                id: "overview".to_string(),
+                text: "What is AnswerCI?".to_string(),
+                intent: None,
+                expected_entities: vec![],
+            }],
+        };
+        let provider = build_provider("mock", &suite).expect("build mock provider");
+        assert_eq!(provider.name(), "mock");
+    }
 }
